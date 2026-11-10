@@ -45,8 +45,7 @@ class ResultsScreen extends StatefulWidget {
   static const Color neonPurple = Color(0xFFC45CFF);
 
   @override
-  State<ResultsScreen> createState() =>
-      _ResultsScreenState();
+  State<ResultsScreen> createState() => _ResultsScreenState();
 }
 
 class _ResultsScreenState extends State<ResultsScreen> {
@@ -56,8 +55,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   // AUDIO
   // ============================================================
 
-  final AudioPlayer _scoreSoundPlayer =
-  AudioPlayer();
+  final AudioPlayer _scoreSoundPlayer = AudioPlayer();
 
   // Every button sound gets its own player.
   //
@@ -75,10 +73,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   void initState() {
     super.initState();
 
-    _videoController =
-        VideoPlayerController.asset(
-          'assets/videos/GamePlay.mp4',
-        );
+    _videoController = VideoPlayerController.asset(
+      'assets/videos/GamePlay.mp4',
+    );
 
     _initializeVideo();
   }
@@ -99,19 +96,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   Future<void> _playScoreSound() async {
     try {
-      final settings =
-      SettingsScope.of(context);
+      final settings = SettingsScope.of(context);
 
-      final accuracy =
-          widget.session.accuracy;
+      final accuracy = widget.session.accuracy;
 
       // Use the same rounded percentage that is displayed
       // on the Results screen.
-      final displayedPercentage =
-      (accuracy * 100).round();
+      final displayedPercentage = (accuracy * 100).round();
 
-      final sound =
-      displayedPercentage >= 50
+      final sound = displayedPercentage >= 50
           ? 'audio/high_score.wav'
           : 'audio/low_score.wav';
 
@@ -157,8 +150,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     });
 
     try {
-      final settings =
-      SettingsScope.of(context);
+      final settings = SettingsScope.of(context);
 
       await player.setVolume(
         settings.sfxVolume,
@@ -220,8 +212,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     _scoreSoundPlayer.dispose();
 
     // Dispose every temporary button sound player.
-    for (final player
-    in List<AudioPlayer>.from(
+    for (final player in List<AudioPlayer>.from(
       _buttonSoundPlayers,
     )) {
       try {
@@ -248,21 +239,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget build(
       BuildContext context,
       ) {
-    final settings =
-    SettingsScope.of(context);
+    final settings = SettingsScope.of(context);
 
-    final isFilipino =
-        settings.isFilipino;
+    final isFilipino = settings.isFilipino;
 
-    final missed =
-        widget.session.missed;
+    final missed = widget.session.missed;
 
-    final accuracy =
-        widget.session.accuracy;
+    final accuracy = widget.session.accuracy;
 
     return Scaffold(
-      backgroundColor:
-      Colors.transparent,
+      backgroundColor: Colors.transparent,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -270,26 +256,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
           SafeArea(
             child: Padding(
-              padding:
-              const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Text(
                     isFilipino
                         ? 'RESULTA'
                         : 'RESULTS',
-                    textAlign:
-                    TextAlign.center,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color:
-                      ResultsScreen
-                          .neonPurple,
+                      color: ResultsScreen.neonPurple,
                       fontSize: 24,
-                      fontWeight:
-                      FontWeight.w900,
+                      fontWeight: FontWeight.w900,
                       letterSpacing: 3,
-                      shadows:
-                      comicShadows,
+                      shadows: comicShadows,
                     ),
                   ),
 
@@ -307,8 +287,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   ),
 
                   Align(
-                    alignment:
-                    Alignment.centerLeft,
+                    alignment: Alignment.centerLeft,
                     child: Text(
                       missed.isEmpty
                           ? (isFilipino
@@ -317,16 +296,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           : (isFilipino
                           ? 'MGA CARD NA BALIKAN'
                           : 'CARDS TO REVIEW'),
-                      style:
-                      const TextStyle(
-                        color:
-                        Colors.white,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 13,
-                        fontWeight:
-                        FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,
-                        shadows:
-                        comicShadows,
+                        shadows: comicShadows,
                       ),
                     ),
                   ),
@@ -341,12 +316,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       isFilipino,
                     )
                         : ListView.separated(
-                      padding:
-                      const EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                         bottom: 8,
                       ),
-                      itemCount:
-                      missed.length,
+                      itemCount: missed.length,
                       separatorBuilder:
                           (
                           context,
@@ -361,13 +334,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           index,
                           ) {
                         return _MissedCard(
-                          feedback:
-                          missed[index],
+                          feedback: missed[index],
                           languageCode:
-                          settings
-                              .languageCode,
-                          isFilipino:
-                          isFilipino,
+                          settings.languageCode,
+                          isFilipino: isFilipino,
                         );
                       },
                     ),
@@ -380,12 +350,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        _ActionButton(
+                        child: _ActionButton(
                           label: 'MENU',
-                          color:
-                          ResultsScreen
-                              .neonPink,
+                          color: ResultsScreen.neonPink,
                           onTap: () {
                             _playButtonSound();
 
@@ -402,14 +369,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       ),
 
                       Expanded(
-                        child:
-                        _ActionButton(
+                        child: _ActionButton(
                           label: isFilipino
                               ? 'MAGLARO MULI'
                               : 'PLAY AGAIN',
-                          color:
-                          ResultsScreen
-                              .neonGreen,
+                          color: ResultsScreen.neonGreen,
                           onTap: () {
                             _playButtonSound();
 
@@ -436,9 +400,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   // ============================================================
 
   Widget _buildVideoBackground() {
-    if (!_videoController
-        .value
-        .isInitialized) {
+    if (!_videoController.value.isInitialized) {
       return const SizedBox.expand(
         child: ColoredBox(
           color: Color(0xFF080817),
@@ -449,14 +411,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
     return FittedBox(
       fit: BoxFit.cover,
       child: SizedBox(
-        width: _videoController
-            .value
-            .size
-            .width,
-        height: _videoController
-            .value
-            .size
-            .height,
+        width: _videoController.value.size.width,
+        height: _videoController.value.size.height,
         child: VideoPlayer(
           _videoController,
         ),
@@ -472,28 +428,66 @@ class _ResultsScreenState extends State<ResultsScreen> {
       bool isFilipino,
       double accuracy,
       ) {
-    final message =
-    accuracy >= 0.8
-        ? (isFilipino
-        ? 'Magaling!'
-        : 'Great job!')
-        : accuracy >= 0.5
-        ? (isFilipino
-        ? 'Magandang pagsisikap!'
-        : 'Good effort!')
-        : (isFilipino
-        ? 'Magpatuloy sa pag-aaral!'
-        : 'Keep practicing!');
+    final percentage = (accuracy * 100).round();
+
+    String message;
+
+    if (percentage == 100) {
+      message = isFilipino
+          ? '100% RESPECT!'
+          : '100% RESPECT!';
+    } else if (percentage >= 90) {
+      message = isFilipino
+          ? 'Wow, gets na gets mo!'
+          : 'Wow, you really get it!';
+    } else if (percentage >= 80) {
+      message = isFilipino
+          ? 'Alam mo kung paano maging magalang!'
+          : 'You know how to be respectful!';
+    } else if (percentage >= 70) {
+      message = isFilipino
+          ? 'Ang galing mong humusga!'
+          : 'Nice judging!';
+    } else if (percentage >= 60) {
+      message = isFilipino
+          ? 'Gets mo na ang idea!'
+          : 'You get the idea!';
+    } else if (percentage >= 50) {
+      message = isFilipino
+          ? 'At least pumasa ka!'
+          : 'At least you made it!';
+    } else if (percentage >= 40) {
+      message = isFilipino
+          ? 'Konti na lang!'
+          : 'Almost got it!';
+    } else if (percentage >= 30) {
+      message = isFilipino
+          ? 'Malapit na!'
+          : 'You\'re getting there!';
+    } else if (percentage >= 20) {
+      message = isFilipino
+          ? 'Umiinit na!'
+          : 'Getting the hang of it!';
+    } else if (percentage >= 10) {
+      message = isFilipino
+          ? 'Tuloy lang!'
+          : 'Still learning!';
+    } else if (percentage >= 5) {
+      message = isFilipino
+          ? 'Nice try, pero kulang pa!'
+          : 'Nice try, but nope!';
+    } else {
+      message = isFilipino
+          ? 'Aray... Subukan ulit!'
+          : 'Oof... Not quite respectful!';
+    }
 
     return CustomPaint(
-      foregroundPainter:
-      _ThickComicBorderPainter(
-        color:
-        ResultsScreen.neonPurple,
+      foregroundPainter: _ThickComicBorderPainter(
+        color: ResultsScreen.neonPurple,
       ),
       child: ClipRRect(
-        borderRadius:
-        BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: 16,
@@ -501,17 +495,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
           ),
           child: Container(
             width: double.infinity,
-            padding:
-            const EdgeInsets.all(20),
-            decoration:
-            BoxDecoration(
-              color:
-              const Color(0xFF3A0B4F)
-                  .withValues(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF3A0B4F).withValues(
                 alpha: 0.5,
               ),
-              borderRadius:
-              BorderRadius.circular(
+              borderRadius: BorderRadius.circular(
                 24,
               ),
             ),
@@ -519,16 +508,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
               children: [
                 Text(
                   '${widget.session.correctCount} / ${widget.session.total}',
-                  style:
-                  const TextStyle(
-                    color:
-                    Colors.white,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 44,
-                    fontWeight:
-                    FontWeight.w900,
+                    fontWeight: FontWeight.w900,
                     height: 1,
-                    shadows:
-                    comicShadows,
+                    shadows: comicShadows,
                   ),
                 ),
 
@@ -537,18 +522,13 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 ),
 
                 Text(
-                  '${(accuracy * 100).round()}% ${isFilipino ? 'TAMA' : 'CORRECT'}',
-                  style:
-                  const TextStyle(
-                    color:
-                    ResultsScreen
-                        .neonGreen,
+                  '$percentage% ${isFilipino ? 'TAMA' : 'CORRECT'}',
+                  style: const TextStyle(
+                    color: ResultsScreen.neonGreen,
                     fontSize: 14,
-                    fontWeight:
-                    FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                     letterSpacing: 1,
-                    shadows:
-                    comicShadows,
+                    shadows: comicShadows,
                   ),
                 ),
 
@@ -558,15 +538,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                 Text(
                   message,
-                  textAlign:
-                  TextAlign.center,
-                  style:
-                  const TextStyle(
-                    color:
-                    Color(0xFFE6B4FF),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFFE6B4FF),
                     fontSize: 15,
-                    shadows:
-                    comicShadows,
+                    shadows: comicShadows,
                   ),
                 ),
               ],
@@ -586,14 +562,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
       ) {
     return Center(
       child: Column(
-        mainAxisSize:
-        MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(
             Icons.auto_awesome_rounded,
-            color:
-            ResultsScreen
-                .neonGreen,
+            color: ResultsScreen.neonGreen,
             size: 48,
           ),
 
@@ -605,16 +578,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
             isFilipino
                 ? 'Perpektong round!'
                 : 'Perfect round!',
-            textAlign:
-            TextAlign.center,
-            style:
-            const TextStyle(
+            textAlign: TextAlign.center,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
-              fontWeight:
-              FontWeight.bold,
-              shadows:
-              comicShadows,
+              fontWeight: FontWeight.bold,
+              shadows: comicShadows,
             ),
           ),
         ],
@@ -627,8 +596,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 // MISSED CARD
 // ================================================================
 
-class _MissedCard
-    extends StatelessWidget {
+class _MissedCard extends StatelessWidget {
   const _MissedCard({
     required this.feedback,
     required this.languageCode,
@@ -657,20 +625,16 @@ class _MissedCard
   Widget build(
       BuildContext context,
       ) {
-    final correctSide =
-    GameSession.expectedSide(
+    final correctSide = GameSession.expectedSide(
       feedback.card,
     );
 
     return CustomPaint(
-      foregroundPainter:
-      _ThickComicBorderPainter(
-        color:
-        ResultsScreen.neonPink,
+      foregroundPainter: _ThickComicBorderPainter(
+        color: ResultsScreen.neonPink,
       ),
       child: ClipRRect(
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: 16,
@@ -678,17 +642,12 @@ class _MissedCard
           ),
           child: Container(
             width: double.infinity,
-            padding:
-            const EdgeInsets.all(16),
-            decoration:
-            BoxDecoration(
-              color:
-              const Color(0xFF3A0B4F)
-                  .withValues(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF3A0B4F).withValues(
                 alpha: 0.5,
               ),
-              borderRadius:
-              BorderRadius.circular(
+              borderRadius: BorderRadius.circular(
                 20,
               ),
             ),
@@ -700,16 +659,12 @@ class _MissedCard
                   feedback.card.textFor(
                     languageCode,
                   ),
-                  style:
-                  const TextStyle(
-                    color:
-                    Colors.white,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 14,
-                    fontWeight:
-                    FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                     height: 1.35,
-                    shadows:
-                    comicShadows,
+                    shadows: comicShadows,
                   ),
                 ),
 
@@ -721,18 +676,12 @@ class _MissedCard
                   isFilipino
                       ? 'Pinili mo: ${_sideLabel(feedback.chosen)}  •  Tama: ${_sideLabel(correctSide)}'
                       : 'You chose: ${_sideLabel(feedback.chosen)}  •  Correct: ${_sideLabel(correctSide)}',
-                  style:
-                  const TextStyle(
-                    color:
-                    ResultsScreen
-                        .neonPink,
+                  style: const TextStyle(
+                    color: ResultsScreen.neonPink,
                     fontSize: 11,
-                    fontWeight:
-                    FontWeight.bold,
-                    letterSpacing:
-                    0.5,
-                    shadows:
-                    comicShadows,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                    shadows: comicShadows,
                   ),
                 ),
 
@@ -741,20 +690,15 @@ class _MissedCard
                 ),
 
                 Text(
-                  feedback.card
-                      .explanationFor(
+                  feedback.card.explanationFor(
                     languageCode,
                   ),
-                  style:
-                  const TextStyle(
-                    color:
-                    Colors.white,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 12,
-                    fontWeight:
-                    FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                     height: 1.35,
-                    shadows:
-                    comicShadows,
+                    shadows: comicShadows,
                   ),
                 ),
               ],
@@ -770,8 +714,7 @@ class _MissedCard
 // THICK COMIC BORDER
 // ================================================================
 
-class _ThickComicBorderPainter
-    extends CustomPainter {
+class _ThickComicBorderPainter extends CustomPainter {
   final Color color;
 
   _ThickComicBorderPainter({
@@ -783,22 +726,17 @@ class _ThickComicBorderPainter
       Canvas canvas,
       Size size,
       ) {
-    final rect =
-    Offset.zero & size;
+    final rect = Offset.zero & size;
 
-    final borderRect =
-    rect.deflate(2);
+    final borderRect = rect.deflate(2);
 
-    final rrect =
-    RRect.fromRectAndRadius(
+    final rrect = RRect.fromRectAndRadius(
       borderRect,
       const Radius.circular(20),
     );
 
-    final blackOutline =
-    Paint()
-      ..style =
-          PaintingStyle.stroke
+    final blackOutline = Paint()
+      ..style = PaintingStyle.stroke
       ..strokeWidth = 6
       ..color = Colors.black;
 
@@ -807,10 +745,8 @@ class _ThickComicBorderPainter
       blackOutline,
     );
 
-    final borderPaint =
-    Paint()
-      ..style =
-          PaintingStyle.stroke
+    final borderPaint = Paint()
+      ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
       ..color = color;
 
@@ -822,12 +758,9 @@ class _ThickComicBorderPainter
 
   @override
   bool shouldRepaint(
-      covariant
-      _ThickComicBorderPainter
-      oldDelegate,
+      covariant _ThickComicBorderPainter oldDelegate,
       ) {
-    return oldDelegate.color !=
-        color;
+    return oldDelegate.color != color;
   }
 }
 
@@ -835,8 +768,7 @@ class _ThickComicBorderPainter
 // ACTION BUTTON
 // ================================================================
 
-class _ActionButton
-    extends StatelessWidget {
+class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.label,
     required this.color,
@@ -853,38 +785,29 @@ class _ActionButton
       ) {
     return OutlinedButton(
       onPressed: onTap,
-      style:
-      OutlinedButton.styleFrom(
+      style: OutlinedButton.styleFrom(
         foregroundColor: color,
         side: BorderSide(
-          color:
-          color.withValues(
+          color: color.withValues(
             alpha: 0.8,
           ),
         ),
-        padding:
-        const EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           vertical: 14,
         ),
-        shape:
-        RoundedRectangleBorder(
-          borderRadius:
-          BorderRadius.circular(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
             14,
           ),
         ),
       ),
       child: Text(
         label,
-        textAlign:
-        TextAlign.center,
-        style:
-        const TextStyle(
-          fontWeight:
-          FontWeight.bold,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
           letterSpacing: 1,
-          shadows:
-          comicShadows,
+          shadows: comicShadows,
         ),
       ),
     );
