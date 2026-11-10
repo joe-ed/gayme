@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -10,15 +11,27 @@ import 'achievement_screen.dart';
 import 'achievement_system.dart';
 
 const List<Shadow> comicShadows = [
-  Shadow(color: Colors.black, offset: Offset(2, 2), blurRadius: 0),
-  Shadow(color: Colors.black, offset: Offset(-2, -2), blurRadius: 0),
-  Shadow(color: Colors.black, offset: Offset(2, -2), blurRadius: 0),
-  Shadow(color: Colors.black, offset: Offset(-2, 2), blurRadius: 0),
+  Shadow(
+    color: Colors.black,
+    offset: Offset(2, 2),
+    blurRadius: 0,
+  ),
+  Shadow(
+    color: Colors.black,
+    offset: Offset(-2, -2),
+    blurRadius: 0,
+  ),
+  Shadow(
+    color: Colors.black,
+    offset: Offset(2, -2),
+    blurRadius: 0,
+  ),
+  Shadow(
+    color: Colors.black,
+    offset: Offset(-2, 2),
+    blurRadius: 0,
+  ),
 ];
-
-void main() {
-  runApp(const StereotypicalApp());
-}
 
 const List<Color> rainbowColors = [
   Color(0xFFFF00E6),
@@ -29,14 +42,58 @@ const List<Color> rainbowColors = [
   Color(0xFFFF00E6),
 ];
 
+// ============================================================
+// BUTTON SOUND
+// ============================================================
+
+Future<void> playButtonSound(BuildContext context) async {
+  final settings = SettingsScope.read(context);
+
+  if (settings.sfxVolume <= 0) {
+    return;
+  }
+
+  final player = AudioPlayer();
+
+  try {
+    await player.setReleaseMode(
+      ReleaseMode.stop,
+    );
+
+    await player.setVolume(
+      settings.sfxVolume,
+    );
+
+    await player.play(
+      AssetSource('audio/button_sounds.wav'),
+    );
+
+    player.onPlayerComplete.listen((_) async {
+      await player.dispose();
+    });
+  } catch (e) {
+    debugPrint(
+      'Button sound failed to play: $e',
+    );
+
+    await player.dispose();
+  }
+}
+
+void main() {
+  runApp(const StereotypicalApp());
+}
+
 class StereotypicalApp extends StatefulWidget {
   const StereotypicalApp({super.key});
 
   @override
-  State<StereotypicalApp> createState() => _StereotypicalAppState();
+  State<StereotypicalApp> createState() =>
+      _StereotypicalAppState();
 }
 
-class _StereotypicalAppState extends State<StereotypicalApp> {
+class _StereotypicalAppState
+    extends State<StereotypicalApp> {
   final AppSettings _settings = AppSettings();
 
   @override
@@ -57,18 +114,54 @@ class _StereotypicalAppState extends State<StereotypicalApp> {
           useMaterial3: true,
           fontFamily: 'Arial',
           textTheme: const TextTheme(
-            bodyLarge: TextStyle(color: Colors.white, shadows: comicShadows),
-            bodyMedium: TextStyle(color: Colors.white, shadows: comicShadows),
-            bodySmall: TextStyle(color: Colors.white, shadows: comicShadows),
-            titleLarge: TextStyle(color: Colors.white, shadows: comicShadows),
-            titleMedium: TextStyle(color: Colors.white, shadows: comicShadows),
-            titleSmall: TextStyle(color: Colors.white, shadows: comicShadows),
-            labelLarge: TextStyle(color: Colors.white, shadows: comicShadows),
-            labelMedium: TextStyle(color: Colors.white, shadows: comicShadows),
-            labelSmall: TextStyle(color: Colors.white, shadows: comicShadows),
-            headlineLarge: TextStyle(color: Colors.white, shadows: comicShadows),
-            headlineMedium: TextStyle(color: Colors.white, shadows: comicShadows),
-            headlineSmall: TextStyle(color: Colors.white, shadows: comicShadows),
+            bodyLarge: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            bodyMedium: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            bodySmall: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            titleLarge: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            titleMedium: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            titleSmall: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            labelLarge: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            labelMedium: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            labelSmall: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            headlineLarge: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            headlineMedium: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
+            headlineSmall: TextStyle(
+              color: Colors.white,
+              shadows: comicShadows,
+            ),
           ),
         ),
         home: const VideoSplashScreen(),
@@ -85,10 +178,12 @@ class VideoSplashScreen extends StatefulWidget {
   const VideoSplashScreen({super.key});
 
   @override
-  State<VideoSplashScreen> createState() => _VideoSplashScreenState();
+  State<VideoSplashScreen> createState() =>
+      _VideoSplashScreenState();
 }
 
-class _VideoSplashScreenState extends State<VideoSplashScreen> {
+class _VideoSplashScreenState
+    extends State<VideoSplashScreen> {
   late VideoPlayerController _videoController;
 
   bool _finished = false;
@@ -97,9 +192,10 @@ class _VideoSplashScreenState extends State<VideoSplashScreen> {
   void initState() {
     super.initState();
 
-    _videoController = VideoPlayerController.asset(
-      'assets/videos/Intro.mp4',
-    );
+    _videoController =
+        VideoPlayerController.asset(
+          'assets/videos/Intro.mp4',
+        );
 
     _initializeVideo();
   }
@@ -110,15 +206,17 @@ class _VideoSplashScreenState extends State<VideoSplashScreen> {
 
       await _videoController.setLooping(false);
 
-      await _videoController.play();
-
       _videoController.addListener(_videoListener);
+
+      await _videoController.play();
 
       if (mounted) {
         setState(() {});
       }
     } catch (e) {
-      debugPrint('Intro.mp4 failed to load: $e');
+      debugPrint(
+        'Intro.mp4 failed to load: $e',
+      );
 
       _goToMainMenu();
     }
@@ -129,8 +227,11 @@ class _VideoSplashScreenState extends State<VideoSplashScreen> {
       return;
     }
 
-    final position = _videoController.value.position;
-    final duration = _videoController.value.duration;
+    final position =
+        _videoController.value.position;
+
+    final duration =
+        _videoController.value.duration;
 
     if (duration > Duration.zero &&
         position >= duration &&
@@ -147,15 +248,20 @@ class _VideoSplashScreenState extends State<VideoSplashScreen> {
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => const MainMenu(),
+        builder: (context) =>
+        const MainMenu(),
       ),
     );
   }
 
   @override
   void dispose() {
-    _videoController.removeListener(_videoListener);
+    _videoController.removeListener(
+      _videoListener,
+    );
+
     _videoController.dispose();
+
     super.dispose();
   }
 
@@ -163,22 +269,21 @@ class _VideoSplashScreenState extends State<VideoSplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _goToMainMenu,
-        child: SizedBox.expand(
-          child: _videoController.value.isInitialized
-              ? FittedBox(
-                  // INTRO STAYS CONTAIN
-                  fit: BoxFit.contain,
-                  child: SizedBox(
-                    width: _videoController.value.size.width,
-                    height: _videoController.value.size.height,
-                    child: VideoPlayer(_videoController),
-                  ),
-                )
-              : const SizedBox.shrink(),
-        ),
+      body: SizedBox.expand(
+        child: _videoController.value.isInitialized
+            ? FittedBox(
+          fit: BoxFit.contain,
+          child: SizedBox(
+            width:
+            _videoController.value.size.width,
+            height:
+            _videoController.value.size.height,
+            child: VideoPlayer(
+              _videoController,
+            ),
+          ),
+        )
+            : const SizedBox.shrink(),
       ),
     );
   }
@@ -192,40 +297,65 @@ class MainMenu extends StatefulWidget {
   const MainMenu({super.key});
 
   @override
-  State<MainMenu> createState() => _MainMenuState();
+  State<MainMenu> createState() =>
+      _MainMenuState();
 }
 
 class _MainMenuState extends State<MainMenu>
-    with SingleTickerProviderStateMixin {
+    with
+        SingleTickerProviderStateMixin,
+        WidgetsBindingObserver {
   late final AnimationController _rainbowController;
 
-  late final VideoPlayerController _menuVideoController;
+  late final VideoPlayerController
+  _menuVideoController;
+
+  late final AudioPlayer _mainBgmPlayer;
 
   late AppSettings _settings;
 
-  bool get isFilipino => _settings.isFilipino;
+  bool _mainBgmPlaying = false;
+
+  bool _gameIsOpen = false;
+
+  bool _mainBgmWasPlayingBeforePause =
+  false;
+
+  bool get isFilipino =>
+      _settings.isFilipino;
 
   @override
   void initState() {
     super.initState();
 
-    _rainbowController = AnimationController(
+    WidgetsBinding.instance.addObserver(
+      this,
+    );
+
+    _rainbowController =
+    AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration:
+      const Duration(seconds: 5),
     )..repeat();
 
-    _menuVideoController = VideoPlayerController.asset(
-      'assets/videos/MainMenu.mp4',
-    );
+    _menuVideoController =
+        VideoPlayerController.asset(
+          'assets/videos/MainMenu.mp4',
+        );
+
+    _mainBgmPlayer = AudioPlayer();
 
     _initializeMenuVideo();
   }
 
   Future<void> _initializeMenuVideo() async {
     try {
-      await _menuVideoController.initialize();
+      await _menuVideoController
+          .initialize();
 
-      await _menuVideoController.setLooping(true);
+      await _menuVideoController
+          .setLooping(true);
 
       await _menuVideoController.play();
 
@@ -233,7 +363,183 @@ class _MainMenuState extends State<MainMenu>
         setState(() {});
       }
     } catch (e) {
-      debugPrint('MainMenu.mp4 failed to load: $e');
+      debugPrint(
+        'MainMenu.mp4 failed to load: $e',
+      );
+    }
+  }
+
+  // ==========================================================
+  // MAIN MENU BGM
+  // ==========================================================
+
+  Future<void> _startMainBgm() async {
+    if (_mainBgmPlaying) {
+      return;
+    }
+
+    if (_gameIsOpen) {
+      return;
+    }
+
+    try {
+      await _mainBgmPlayer.setReleaseMode(
+        ReleaseMode.loop,
+      );
+
+      await _mainBgmPlayer.setVolume(
+        _settings.musicVolume,
+      );
+
+      await _mainBgmPlayer.play(
+        AssetSource('audio/menu_bgm.mp3'),
+      );
+
+      _mainBgmPlaying = true;
+    } catch (e) {
+      _mainBgmPlaying = false;
+
+      debugPrint(
+        'Main BGM failed to load: $e',
+      );
+    }
+  }
+
+  Future<void> _stopMainBgm() async {
+    try {
+      await _mainBgmPlayer.stop();
+    } catch (e) {
+      debugPrint(
+        'Main BGM failed to stop: $e',
+      );
+    }
+
+    _mainBgmPlaying = false;
+  }
+
+  // ==========================================================
+  // PAUSE MAIN MENU BGM
+  // ==========================================================
+
+  Future<void> _pauseMainBgm() async {
+    if (!_mainBgmPlaying) {
+      return;
+    }
+
+    _mainBgmWasPlayingBeforePause =
+    true;
+
+    try {
+      await _mainBgmPlayer.pause();
+    } catch (e) {
+      debugPrint(
+        'Main BGM failed to pause: $e',
+      );
+    }
+
+    _mainBgmPlaying = false;
+  }
+
+  // ==========================================================
+  // RESUME MAIN MENU BGM
+  // ==========================================================
+
+  Future<void> _resumeMainBgm() async {
+    if (!_mainBgmWasPlayingBeforePause) {
+      return;
+    }
+
+    if (_gameIsOpen) {
+      return;
+    }
+
+    try {
+      await _mainBgmPlayer.setVolume(
+        _settings.musicVolume,
+      );
+
+      await _mainBgmPlayer.resume();
+
+      _mainBgmPlaying = true;
+    } catch (e) {
+      debugPrint(
+        'Main BGM failed to resume: $e',
+      );
+    }
+
+    _mainBgmWasPlayingBeforePause =
+    false;
+  }
+
+  Future<void> _updateMainBgmVolume() async {
+    if (!_mainBgmPlaying) {
+      return;
+    }
+
+    try {
+      await _mainBgmPlayer.setVolume(
+        _settings.musicVolume,
+      );
+    } catch (e) {
+      debugPrint(
+        'Main BGM volume update failed: $e',
+      );
+    }
+  }
+
+  // ==========================================================
+  // APP LIFECYCLE
+  // ==========================================================
+
+  @override
+  void didChangeAppLifecycleState(
+      AppLifecycleState state,
+      ) {
+    super.didChangeAppLifecycleState(
+      state,
+    );
+
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        _pauseMainBgm();
+
+        if (_menuVideoController
+            .value.isInitialized &&
+            _menuVideoController
+                .value.isPlaying) {
+          _menuVideoController.pause();
+        }
+        break;
+
+      case AppLifecycleState.resumed:
+        if (!_gameIsOpen) {
+          _resumeMainBgm();
+
+          if (_menuVideoController
+              .value.isInitialized &&
+              !_menuVideoController
+                  .value.isPlaying) {
+            _menuVideoController.play();
+          }
+        }
+        break;
+
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  // ==========================================================
+  // SETTINGS LISTENER
+  // ==========================================================
+
+  void _settingsChanged() {
+    _updateMainBgmVolume();
+
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -243,27 +549,62 @@ class _MainMenuState extends State<MainMenu>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _settings = SettingsScope.of(context);
+    _settings =
+        SettingsScope.of(context);
 
-    final animation = ModalRoute.of(context)?.animation;
-    if (_routeAnimation != animation) {
-      _routeAnimation?.removeStatusListener(_animationStatusListener);
-      _routeAnimation = animation;
-      _routeAnimation?.addStatusListener(_animationStatusListener);
+    _settings.removeListener(
+      _settingsChanged,
+    );
+
+    _settings.addListener(
+      _settingsChanged,
+    );
+
+    if (!_gameIsOpen) {
+      _startMainBgm();
     }
 
-    if (ModalRoute.of(context)?.isCurrent == true && _menuVideoController.value.isInitialized) {
+    final animation =
+        ModalRoute.of(context)?.animation;
+
+    if (_routeAnimation != animation) {
+      _routeAnimation
+          ?.removeStatusListener(
+        _animationStatusListener,
+      );
+
+      _routeAnimation = animation;
+
+      _routeAnimation?.addStatusListener(
+        _animationStatusListener,
+      );
+    }
+
+    if (ModalRoute.of(context)?.isCurrent ==
+        true &&
+        _menuVideoController
+            .value.isInitialized) {
       _menuVideoController.play();
-      _menuVideoController.setLooping(true);
+      _menuVideoController.setLooping(
+        true,
+      );
     }
   }
 
-  void _animationStatusListener(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      if (ModalRoute.of(context)?.isCurrent == true) {
-        if (_menuVideoController.value.isInitialized) {
+  void _animationStatusListener(
+      AnimationStatus status,
+      ) {
+    if (status ==
+        AnimationStatus.completed) {
+      if (ModalRoute.of(context)
+          ?.isCurrent ==
+          true) {
+        if (_menuVideoController
+            .value.isInitialized) {
           _menuVideoController.play();
-          _menuVideoController.setLooping(true);
+
+          _menuVideoController
+              .setLooping(true);
         }
       }
     }
@@ -271,9 +612,24 @@ class _MainMenuState extends State<MainMenu>
 
   @override
   void dispose() {
-    _routeAnimation?.removeStatusListener(_animationStatusListener);
+    WidgetsBinding.instance
+        .removeObserver(this);
+
+    _settings.removeListener(
+      _settingsChanged,
+    );
+
+    _routeAnimation
+        ?.removeStatusListener(
+      _animationStatusListener,
+    );
+
     _rainbowController.dispose();
+
     _menuVideoController.dispose();
+
+    _mainBgmPlayer.stop();
+    _mainBgmPlayer.dispose();
 
     super.dispose();
   }
@@ -281,113 +637,195 @@ class _MainMenuState extends State<MainMenu>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor:
+      Colors.transparent,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ==================================================
-          // MAIN MENU VIDEO
-          // NO FALLBACK
-          // NO GRADIENT
-          // NO BLACK OVERLAY
-          // ==================================================
-
-          if (_menuVideoController.value.isInitialized)
+          if (_menuVideoController
+              .value.isInitialized)
             FittedBox(
               fit: BoxFit.cover,
               child: SizedBox(
-                width: _menuVideoController.value.size.width,
-                height: _menuVideoController.value.size.height,
-                child: VideoPlayer(_menuVideoController),
+                width:
+                _menuVideoController
+                    .value.size.width,
+                height:
+                _menuVideoController
+                    .value.size.height,
+                child: VideoPlayer(
+                  _menuVideoController,
+                ),
               ),
             ),
 
-          // ==================================================
-          // MENU CONTENT
-          // ==================================================
-
           SafeArea(
             child: LayoutBuilder(
-              builder: (context, constraints) {
-                final width = constraints.maxWidth;
-                final height = constraints.maxHeight;
+              builder:
+                  (context, constraints) {
+                final width =
+                    constraints.maxWidth;
+
+                final height =
+                    constraints.maxHeight;
 
                 final logoSize =
-                (width * 0.70).clamp(210.0, 320.0);
+                (width * 0.70)
+                    .clamp(
+                  210.0,
+                  320.0,
+                );
 
                 final iconSize =
-                width < 380 ? 58.0 : 66.0;
+                width < 380
+                    ? 58.0
+                    : 66.0;
 
                 return Stack(
-                  alignment: Alignment.center,
+                  alignment:
+                  Alignment.center,
                   children: [
                     // ==================================================
-                    // TOP-LEFT ACHIEVEMENT PROGRESS BADGE
+                    // ACHIEVEMENT PROGRESS
                     // ==================================================
+
                     Positioned(
                       top: 10,
                       left: 12,
-                      child: GestureDetector(
-                        onTap: showAchievements,
+                      child:
+                      GestureDetector(
+                        onTap: () {
+                          playButtonSound(
+                            context,
+                          );
+
+                          showAchievements();
+                        },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding:
+                          const EdgeInsets
+                              .symmetric(
                             horizontal: 12,
                             vertical: 8,
                           ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF111126)
-                                .withValues(alpha: 0.85),
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: const Color(0xFFFFF500),
+                          decoration:
+                          BoxDecoration(
+                            color: const Color(
+                              0xFF111126,
+                            ).withValues(
+                              alpha: 0.85,
+                            ),
+                            borderRadius:
+                            BorderRadius
+                                .circular(
+                              18,
+                            ),
+                            border:
+                            Border.all(
+                              color:
+                              const Color(
+                                0xFFFFF500,
+                              ),
                               width: 2,
                             ),
-                            boxShadow: const [
+                            boxShadow:
+                            const [
                               BoxShadow(
-                                color: Colors.black,
-                                offset: Offset(3, 4),
+                                color:
+                                Colors.black,
+                                offset:
+                                Offset(
+                                  3,
+                                  4,
+                                ),
                                 blurRadius: 0,
                               ),
                             ],
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisSize:
+                            MainAxisSize
+                                .min,
                             children: [
                               const Icon(
-                                Icons.emoji_events_rounded,
-                                color: Color(0xFFFFF500),
+                                Icons
+                                    .emoji_events_rounded,
+                                color:
+                                Color(
+                                  0xFFFFF500,
+                                ),
                                 size: 22,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(
+                                width: 8,
+                              ),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+                                mainAxisSize:
+                                MainAxisSize
+                                    .min,
                                 children: [
                                   Text(
                                     '${AchievementManager.allAchievements.where((a) => _settings.achievements.isUnlocked(a.id)).length} / ${AchievementManager.allAchievements.length}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1,
+                                    style:
+                                    const TextStyle(
+                                      color:
+                                      Colors.white,
+                                      fontSize:
+                                      12,
+                                      fontWeight:
+                                      FontWeight
+                                          .bold,
+                                      letterSpacing:
+                                      1,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(
+                                    height: 4,
+                                  ),
                                   SizedBox(
                                     width: 60,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: LinearProgressIndicator(
-                                        value: AchievementManager.allAchievements
-                                            .where((a) => _settings.achievements.isUnlocked(a.id))
+                                    child:
+                                    ClipRRect(
+                                      borderRadius:
+                                      BorderRadius
+                                          .circular(
+                                        6,
+                                      ),
+                                      child:
+                                      LinearProgressIndicator(
+                                        value:
+                                        AchievementManager
+                                            .allAchievements
+                                            .where(
+                                              (a) =>
+                                              _settings
+                                                  .achievements
+                                                  .isUnlocked(
+                                                a.id,
+                                              ),
+                                        )
                                             .length /
-                                            AchievementManager.allAchievements.length,
-                                        minHeight: 5,
+                                            AchievementManager
+                                                .allAchievements
+                                                .length,
+                                        minHeight:
+                                        5,
                                         backgroundColor:
-                                        Colors.white.withValues(alpha: 0.15),
+                                        Colors
+                                            .white
+                                            .withValues(
+                                          alpha:
+                                          0.15,
+                                        ),
                                         valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                          Color(0xFF39FF14),
+                                        const AlwaysStoppedAnimation<
+                                            Color>(
+                                          Color(
+                                            0xFF39FF14,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -405,15 +843,20 @@ class _MainMenuState extends State<MainMenu>
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.07,
+                      top:
+                      height * 0.07,
                       left: 0,
                       right: 0,
                       child: Center(
-                        child: StereotypicalLogo(
+                        child:
+                        StereotypicalLogo(
                           size: logoSize,
                           rotation:
-                          _rainbowController.value * 6.28318,
-                          animation: _rainbowController,
+                          _rainbowController
+                              .value *
+                              6.28318,
+                          animation:
+                          _rainbowController,
                         ),
                       ),
                     ),
@@ -423,15 +866,22 @@ class _MainMenuState extends State<MainMenu>
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.43,
+                      top:
+                      height * 0.43,
                       left: 0,
                       right: 0,
                       child: Center(
                         child: NeonIcon(
-                          icon: Icons.settings_rounded,
-                          color: const Color(0xFFB76BFF),
-                          onTap: showSettings,
-                          size: iconSize,
+                          icon: Icons
+                              .settings_rounded,
+                          color:
+                          const Color(
+                            0xFFB76BFF,
+                          ),
+                          onTap:
+                          showSettings,
+                          size:
+                          iconSize,
                         ),
                       ),
                     ),
@@ -441,13 +891,21 @@ class _MainMenuState extends State<MainMenu>
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.51,
-                      left: width * 0.20,
+                      top:
+                      height * 0.51,
+                      left:
+                      width * 0.20,
                       child: NeonIcon(
-                        icon: Icons.help_outline_rounded,
-                        color: const Color(0xFF00B8D4),
-                        onTap: showHowToPlay,
-                        size: iconSize,
+                        icon: Icons
+                            .help_outline_rounded,
+                        color:
+                        const Color(
+                          0xFF00B8D4,
+                        ),
+                        onTap:
+                        showHowToPlay,
+                        size:
+                        iconSize,
                       ),
                     ),
 
@@ -456,13 +914,21 @@ class _MainMenuState extends State<MainMenu>
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.51,
-                      right: width * 0.20,
+                      top:
+                      height * 0.51,
+                      right:
+                      width * 0.20,
                       child: NeonIcon(
-                        icon: Icons.emoji_events_rounded,
-                        color: const Color(0xFFFFB300),
-                        onTap: showAchievements,
-                        size: iconSize,
+                        icon: Icons
+                            .emoji_events_rounded,
+                        color:
+                        const Color(
+                          0xFFFFB300,
+                        ),
+                        onTap:
+                        showAchievements,
+                        size:
+                        iconSize,
                       ),
                     ),
 
@@ -471,13 +937,21 @@ class _MainMenuState extends State<MainMenu>
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.60,
-                      left: width * 0.08,
+                      top:
+                      height * 0.60,
+                      left:
+                      width * 0.08,
                       child: NeonIcon(
-                        icon: Icons.people_alt_rounded,
-                        color: const Color(0xFFE83E8C),
-                        onTap: showCredits,
-                        size: iconSize,
+                        icon: Icons
+                            .people_alt_rounded,
+                        color:
+                        const Color(
+                          0xFFE83E8C,
+                        ),
+                        onTap:
+                        showCredits,
+                        size:
+                        iconSize,
                       ),
                     ),
 
@@ -486,33 +960,53 @@ class _MainMenuState extends State<MainMenu>
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.60,
-                      right: width * 0.08,
+                      top:
+                      height * 0.60,
+                      right:
+                      width * 0.08,
                       child: NeonIcon(
-                        icon: Icons.exit_to_app_rounded,
-                        color: const Color(0xFFE53935),
-                        onTap: confirmExit,
-                        size: iconSize,
+                        icon: Icons
+                            .exit_to_app_rounded,
+                        color:
+                        const Color(
+                          0xFFE53935,
+                        ),
+                        onTap:
+                        confirmExit,
+                        size:
+                        iconSize,
                       ),
                     ),
 
                     // ==================================================
-                    // PLAY BUTTON
+                    // PLAY
                     // ==================================================
 
                     Positioned(
-                      top: height * 0.56,
+                      top:
+                      height * 0.56,
                       left: 0,
                       right: 0,
                       child: Center(
-                        child: AnimatedBuilder(
-                          animation: _rainbowController,
-                          builder: (context, child) {
+                        child:
+                        AnimatedBuilder(
+                          animation:
+                          _rainbowController,
+                          builder:
+                              (
+                              context,
+                              child,
+                              ) {
                             return ComicPlayButton(
-                              size: iconSize * 1.35,
+                              size:
+                              iconSize *
+                                  1.35,
                               rotation:
-                              _rainbowController.value * 6.28318,
-                              onTap: startGame,
+                              _rainbowController
+                                  .value *
+                                  6.28318,
+                              onTap:
+                              startGame,
                             );
                           },
                         ),
@@ -532,13 +1026,45 @@ class _MainMenuState extends State<MainMenu>
   // START GAME
   // ============================================================
 
-  void startGame() {
-    Navigator.push(
+  Future<void> startGame() async {
+    _gameIsOpen = true;
+
+    await _stopMainBgm();
+
+    if (_menuVideoController
+        .value.isInitialized) {
+      await _menuVideoController
+          .pause();
+    }
+
+    if (!mounted) {
+      _gameIsOpen = false;
+      return;
+    }
+
+    await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const GameScreen(),
+        builder: (context) =>
+        const GameScreen(),
       ),
     );
+
+    if (!mounted) {
+      return;
+    }
+
+    _gameIsOpen = false;
+
+    await _startMainBgm();
+
+    if (_menuVideoController
+        .value.isInitialized) {
+      await _menuVideoController
+          .setLooping(true);
+
+      await _menuVideoController.play();
+    }
   }
 
   // ============================================================
@@ -549,7 +1075,8 @@ class _MainMenuState extends State<MainMenu>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AchievementScreen(),
+        builder: (context) =>
+        const AchievementScreen(),
       ),
     );
   }
@@ -563,7 +1090,10 @@ class _MainMenuState extends State<MainMenu>
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Exit',
-      barrierColor: Colors.black.withValues(alpha: 0.25),
+      barrierColor:
+      Colors.black.withValues(
+        alpha: 0.25,
+      ),
       pageBuilder: (
           dialogContext,
           animation,
@@ -578,33 +1108,53 @@ class _MainMenuState extends State<MainMenu>
               isFilipino
                   ? 'Sigurado ka bang gusto mong lumabas?'
                   : 'Are you sure you want to exit?',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
+              textAlign:
+              TextAlign.center,
+              style:
+              const TextStyle(
                 color: Colors.white,
                 height: 1.5,
-                shadows: comicShadows,
+                shadows:
+                comicShadows,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(
+              height: 20,
+            ),
             Row(
               children: [
                 Expanded(
                   child: _DialogButton(
-                    label:
-                    isFilipino ? 'KANSELAHIN' : 'CANCEL',
-                    color: const Color(0xFF00A6C7),
+                    label: isFilipino
+                        ? 'KANSELAHIN'
+                        : 'CANCEL',
+                    color:
+                    const Color(
+                      0xFF00A6C7,
+                    ),
                     onTap: () =>
-                        Navigator.pop(dialogContext),
+                        Navigator.pop(
+                          dialogContext,
+                        ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(
+                  width: 12,
+                ),
                 Expanded(
                   child: _DialogButton(
-                    label:
-                    isFilipino ? 'LUMABAS' : 'EXIT',
-                    color: const Color(0xFFE53935),
+                    label: isFilipino
+                        ? 'LUMABAS'
+                        : 'EXIT',
+                    color:
+                    const Color(
+                      0xFFE53935,
+                    ),
                     onTap: () {
-                      Navigator.pop(dialogContext);
+                      Navigator.pop(
+                        dialogContext,
+                      );
+
                       SystemNavigator.pop();
                     },
                   ),
@@ -629,7 +1179,8 @@ class _MainMenuState extends State<MainMenu>
             ).animate(
               CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeOutCubic,
+                curve:
+                Curves.easeOutCubic,
               ),
             ),
             child: child,
@@ -648,9 +1199,14 @@ class _MainMenuState extends State<MainMenu>
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Settings',
-      barrierColor: Colors.black.withValues(alpha: 0.25),
+      barrierColor:
+      Colors.black.withValues(
+        alpha: 0.25,
+      ),
       transitionDuration:
-      const Duration(milliseconds: 250),
+      const Duration(
+        milliseconds: 250,
+      ),
       pageBuilder: (
           dialogContext,
           animation,
@@ -661,46 +1217,73 @@ class _MainMenuState extends State<MainMenu>
             color: Colors.transparent,
             child: ListenableBuilder(
               listenable: _settings,
-              builder: (context, _) {
+              builder: (
+                  context,
+                  _,
+                  ) {
                 return Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding:
+                  const EdgeInsets.all(
+                    20,
+                  ),
                   child: ClipRRect(
                     borderRadius:
-                    BorderRadius.circular(28),
+                    BorderRadius.circular(
+                      28,
+                    ),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(
+                      filter:
+                      ImageFilter.blur(
                         sigmaX: 20,
                         sigmaY: 20,
                       ),
                       child: Container(
                         width: 420,
-                        constraints: BoxConstraints(
+                        constraints:
+                        BoxConstraints(
                           maxHeight:
-                          MediaQuery.of(context)
-                              .size
-                              .height *
+                          MediaQuery.of(
+                            context,
+                          ).size.height *
                               0.85,
                         ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF111126)
-                              .withValues(alpha: 0.20),
+                        decoration:
+                        BoxDecoration(
+                          color:
+                          const Color(
+                            0xFF111126,
+                          ).withValues(
+                            alpha: 0.20,
+                          ),
                           borderRadius:
-                          BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.black,
+                          BorderRadius.circular(
+                            28,
+                          ),
+                          border:
+                          Border.all(
+                            color:
+                            Colors.black,
                             width: 1.2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFC45CFF)
-                                  .withValues(alpha: 0.12),
+                              color:
+                              const Color(
+                                0xFFC45CFF,
+                              ).withValues(
+                                alpha: 0.12,
+                              ),
                               blurRadius: 30,
                             ),
                           ],
                         ),
-                        child: SingleChildScrollView(
+                        child:
+                        SingleChildScrollView(
                           padding:
-                          const EdgeInsets.all(24),
+                          const EdgeInsets
+                              .all(
+                            24,
+                          ),
                           child: Column(
                             mainAxisSize:
                             MainAxisSize.min,
@@ -708,12 +1291,17 @@ class _MainMenuState extends State<MainMenu>
                               Row(
                                 children: [
                                   const Icon(
-                                    Icons.settings,
+                                    Icons
+                                        .settings,
                                     color:
-                                    Color(0xFFC45CFF),
+                                    Color(
+                                      0xFFC45CFF,
+                                    ),
                                     size: 26,
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
                                   Expanded(
                                     child: Text(
                                       isFilipino
@@ -721,72 +1309,127 @@ class _MainMenuState extends State<MainMenu>
                                           : 'SETTINGS',
                                       style:
                                       const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
+                                        color:
+                                        Colors
+                                            .white,
+                                        fontSize:
+                                        20,
                                         fontWeight:
-                                        FontWeight.bold,
-                                        letterSpacing: 2,
+                                        FontWeight
+                                            .bold,
+                                        letterSpacing:
+                                        2,
                                       ),
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () =>
-                                        Navigator.pop(
-                                            dialogContext),
-                                    icon: const Icon(
+                                    onPressed:
+                                        () {
+                                      playButtonSound(
+                                        context,
+                                      );
+
+                                      Navigator.pop(
+                                        dialogContext,
+                                      );
+                                    },
+                                    icon:
+                                    const Icon(
                                       Icons.close,
-                                      color: Colors.white,
+                                      color:
+                                      Colors
+                                          .white,
                                     ),
                                   ),
                                 ],
                               ),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(
+                                height: 16,
+                              ),
 
-                              _settingsSection('AUDIO'),
+                              _settingsSection(
+                                'AUDIO',
+                              ),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(
+                                height: 16,
+                              ),
+
+                              // ==================================================
+                              // MUSIC VOLUME
+                              // BUTTON SOUND ON ICON ONLY
+                              // SLIDER HAS NO BUTTON SOUND
+                              // ==================================================
 
                               _SettingsVolumeControl(
-                                icon:
-                                _settings.musicVolume ==
+                                icon: _settings
+                                    .musicVolume ==
                                     0
-                                    ? Icons.music_off
-                                    : Icons.music_note,
-                                title: isFilipino
+                                    ? Icons
+                                    .music_off
+                                    : Icons
+                                    .music_note,
+                                title:
+                                isFilipino
                                     ? 'Musika'
                                     : 'Music',
                                 value:
-                                _settings.musicVolume,
-                                onChanged: (value) {
-                                  _settings.musicVolume =
+                                _settings
+                                    .musicVolume,
+                                onChanged:
+                                    (value) {
+                                  _settings
+                                      .musicVolume =
                                       value;
                                 },
                                 onIconTap:
-                                _settings.toggleMusic,
+                                _settings
+                                    .toggleMusic,
+                                playSliderSound:
+                                false,
                               ),
 
-                              const SizedBox(height: 12),
+                              const SizedBox(
+                                height: 12,
+                              ),
+
+                              // ==================================================
+                              // SOUND EFFECTS VOLUME
+                              // BUTTON SOUND ON ICON + SLIDER
+                              // ==================================================
 
                               _SettingsVolumeControl(
-                                icon:
-                                _settings.sfxVolume == 0
-                                    ? Icons.volume_off
-                                    : Icons.volume_up,
-                                title: isFilipino
+                                icon: _settings
+                                    .sfxVolume ==
+                                    0
+                                    ? Icons
+                                    .volume_off
+                                    : Icons
+                                    .volume_up,
+                                title:
+                                isFilipino
                                     ? 'Epekto ng Tunog'
                                     : 'Sound Effects',
                                 value:
-                                _settings.sfxVolume,
-                                onChanged: (value) {
-                                  _settings.sfxVolume =
+                                _settings
+                                    .sfxVolume,
+                                onChanged:
+                                    (value) {
+                                  _settings
+                                      .sfxVolume =
                                       value;
                                 },
                                 onIconTap:
-                                _settings.toggleSfx,
+                                _settings
+                                    .toggleSfx,
+                                playSliderSound:
+                                true,
                               ),
 
-                              const SizedBox(height: 24),
+                              const SizedBox(
+                                height: 24,
+                              ),
 
                               _settingsSection(
                                 isFilipino
@@ -794,14 +1437,17 @@ class _MainMenuState extends State<MainMenu>
                                     : 'LANGUAGE',
                               ),
 
-                              const SizedBox(height: 12),
+                              const SizedBox(
+                                height: 12,
+                              ),
 
                               Row(
                                 children: [
                                   Expanded(
                                     child:
                                     _SettingsLanguageButton(
-                                      label: 'English',
+                                      label:
+                                      'English',
                                       selected:
                                       _settings
                                           .language ==
@@ -815,11 +1461,14 @@ class _MainMenuState extends State<MainMenu>
                                       },
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
                                   Expanded(
                                     child:
                                     _SettingsLanguageButton(
-                                      label: 'Filipino',
+                                      label:
+                                      'Filipino',
                                       selected:
                                       _settings
                                           .language ==
@@ -836,24 +1485,35 @@ class _MainMenuState extends State<MainMenu>
                                 ],
                               ),
 
-                              const SizedBox(height: 24),
-
-                              Divider(
-                                color: Colors.white
-                                    .withValues(alpha: 0.2),
+                              const SizedBox(
+                                height: 24,
                               ),
 
-                              const SizedBox(height: 8),
+                              Divider(
+                                color: Colors
+                                    .white
+                                    .withValues(
+                                  alpha: 0.2,
+                                ),
+                              ),
+
+                              const SizedBox(
+                                height: 8,
+                              ),
 
                               _DialogButton(
-                                label: isFilipino
+                                label:
+                                isFilipino
                                     ? 'TAPOS NA'
                                     : 'DONE',
                                 color:
-                                const Color(0xFF00A6C7),
+                                const Color(
+                                  0xFF00A6C7,
+                                ),
                                 onTap: () =>
                                     Navigator.pop(
-                                        dialogContext),
+                                      dialogContext,
+                                    ),
                               ),
                             ],
                           ),
@@ -882,7 +1542,8 @@ class _MainMenuState extends State<MainMenu>
             ).animate(
               CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeOutCubic,
+                curve:
+                Curves.easeOutCubic,
               ),
             ),
             child: child,
@@ -892,15 +1553,21 @@ class _MainMenuState extends State<MainMenu>
     );
   }
 
-  Widget _settingsSection(String title) {
+  Widget _settingsSection(
+      String title,
+      ) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment:
+      Alignment.centerLeft,
       child: Text(
         title,
-        style: const TextStyle(
-          color: Color(0xFFC45CFF),
+        style:
+        const TextStyle(
+          color:
+          Color(0xFFC45CFF),
           fontSize: 12,
-          fontWeight: FontWeight.bold,
+          fontWeight:
+          FontWeight.bold,
           letterSpacing: 2,
         ),
       ),
@@ -941,17 +1608,15 @@ class _MainMenuState extends State<MainMenu>
           'Dorencio, Willmoore B.\n'
           'Francis, Jade Rhyss D.\n'
           'Luana, Macklien A.\n'
-          'Quintero, Genesis Joed T\n.'
+          'Quintero, Genesis Joed T.\n'
           'Tundagui, Patrick jr .\n'
-
-
           : 'STEREOTYPICAL\n\n'
           'Developed by TEAM MAKKI.\n\n'
           'Dorencio, Willmoore B.\n'
           'Francis, Jade Rhyss D.\n'
           'Luana, Macklien A.\n'
           'Quintero, Genesis Joed T.\n'
-          'Tundagui, Patrick jr .\n'
+          'Tundagui, Patrick jr .\n',
     );
   }
 
@@ -968,7 +1633,9 @@ class _MainMenuState extends State<MainMenu>
       barrierDismissible: true,
       barrierLabel: title,
       barrierColor:
-      Colors.black.withValues(alpha: 0.25),
+      Colors.black.withValues(
+        alpha: 0.25,
+      ),
       pageBuilder: (
           dialogContext,
           animation,
@@ -979,20 +1646,29 @@ class _MainMenuState extends State<MainMenu>
           children: [
             Text(
               message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
+              textAlign:
+              TextAlign.center,
+              style:
+              const TextStyle(
                 color: Colors.white,
                 height: 1.5,
-                shadows: comicShadows,
+                shadows:
+                comicShadows,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(
+              height: 20,
+            ),
             _DialogButton(
-              label:
-              isFilipino ? 'ISARA' : 'CLOSE',
-              color: const Color(0xFF00A6C7),
+              label: isFilipino
+                  ? 'ISARA'
+                  : 'CLOSE',
+              color:
+              const Color(0xFF00A6C7),
               onTap: () =>
-                  Navigator.pop(dialogContext),
+                  Navigator.pop(
+                    dialogContext,
+                  ),
             ),
           ],
         );
@@ -1012,7 +1688,8 @@ class _MainMenuState extends State<MainMenu>
             ).animate(
               CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeOutCubic,
+                curve:
+                Curves.easeOutCubic,
               ),
             ),
             child: child,
@@ -1027,7 +1704,8 @@ class _MainMenuState extends State<MainMenu>
 // COMIC PLAY BUTTON
 // ============================================================
 
-class ComicPlayButton extends StatelessWidget {
+class ComicPlayButton
+    extends StatelessWidget {
   final double size;
   final double rotation;
   final VoidCallback onTap;
@@ -1040,18 +1718,28 @@ class ComicPlayButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Container(
       width: size,
       height: size,
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
+      padding:
+      const EdgeInsets.all(5),
+      decoration:
+      BoxDecoration(
         shape: BoxShape.circle,
-        gradient: SweepGradient(
-          transform: GradientRotation(rotation),
-          colors: rainbowColors,
+        gradient:
+        SweepGradient(
+          transform:
+          GradientRotation(
+            rotation,
+          ),
+          colors:
+          rainbowColors,
         ),
-        boxShadow: const [
+        boxShadow:
+        const [
           BoxShadow(
             color: Colors.black,
             blurRadius: 0,
@@ -1061,42 +1749,69 @@ class ComicPlayButton extends StatelessWidget {
         ],
       ),
       child: Container(
-        decoration: BoxDecoration(
+        decoration:
+        BoxDecoration(
           shape: BoxShape.circle,
-          color: const Color(0xFF3D2378),
-          border: Border.all(
+          color:
+          const Color(0xFF3D2378),
+          border:
+          Border.all(
             color: Colors.black,
             width: 4,
           ),
         ),
         child: Material(
-          color: Colors.transparent,
-          shape: const CircleBorder(),
+          color:
+          Colors.transparent,
+          shape:
+          const CircleBorder(),
           child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
+            onTap: () {
+              playButtonSound(
+                context,
+              );
+
+              onTap();
+            },
+            customBorder:
+            const CircleBorder(),
             child: Center(
               child: Container(
-                width: size * 0.58,
-                height: size * 0.58,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                  Colors.white.withValues(alpha: 0.12),
-                  border: Border.all(
-                    color:
-                    Colors.white.withValues(alpha: 0.75),
+                width:
+                size * 0.58,
+                height:
+                size * 0.58,
+                decoration:
+                BoxDecoration(
+                  shape:
+                  BoxShape.circle,
+                  color: Colors.white
+                      .withValues(
+                    alpha: 0.12,
+                  ),
+                  border:
+                  Border.all(
+                    color: Colors.white
+                        .withValues(
+                      alpha: 0.75,
+                    ),
                     width: 3,
                   ),
                 ),
                 child: Icon(
-                  Icons.play_arrow_rounded,
-                  color: Colors.white,
-                  size: size * 0.43,
-                  shadows: const [
+                  Icons
+                      .play_arrow_rounded,
+                  color:
+                  Colors.white,
+                  size:
+                  size * 0.43,
+                  shadows:
+                  const [
                     Shadow(
-                      color: Colors.black,
-                      offset: Offset(3, 3),
+                      color:
+                      Colors.black,
+                      offset:
+                      Offset(3, 3),
                       blurRadius: 0,
                     ),
                   ],
@@ -1119,8 +1834,13 @@ class _SettingsVolumeControl
   final IconData icon;
   final String title;
   final double value;
-  final ValueChanged<double> onChanged;
+  final ValueChanged<double>
+  onChanged;
   final VoidCallback onIconTap;
+
+  // TRUE = slider plays buttons_sound.wav
+  // FALSE = slider stays silent
+  final bool playSliderSound;
 
   const _SettingsVolumeControl({
     required this.icon,
@@ -1128,23 +1848,35 @@ class _SettingsVolumeControl
     required this.value,
     required this.onChanged,
     required this.onIconTap,
+    required this.playSliderSound,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Container(
-      padding: const EdgeInsets.symmetric(
+      padding:
+      const EdgeInsets.symmetric(
         horizontal: 14,
         vertical: 10,
       ),
-      decoration: BoxDecoration(
-        color:
-        Colors.white.withValues(alpha: 0.06),
+      decoration:
+      BoxDecoration(
+        color: Colors.white
+            .withValues(
+          alpha: 0.06,
+        ),
         borderRadius:
-        BorderRadius.circular(16),
-        border: Border.all(
-          color:
-          Colors.white.withValues(alpha: 0.12),
+        BorderRadius.circular(
+          16,
+        ),
+        border:
+        Border.all(
+          color: Colors.white
+              .withValues(
+            alpha: 0.12,
+          ),
         ),
       ),
       child: Column(
@@ -1152,58 +1884,99 @@ class _SettingsVolumeControl
           Row(
             children: [
               GestureDetector(
-                onTap: onIconTap,
+                onTap: () {
+                  playButtonSound(
+                    context,
+                  );
+
+                  onIconTap();
+                },
                 child: Icon(
                   icon,
                   color: value == 0
                       ? Colors.white54
-                      : const Color(0xFF00A6C7),
+                      : const Color(
+                    0xFF00A6C7,
+                  ),
                   size: 22,
                 ),
               ),
-              const SizedBox(width: 12),
+
+              const SizedBox(
+                width: 12,
+              ),
+
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style:
+                  const TextStyle(
+                    color:
+                    Colors.white,
                     fontSize: 14,
-                    shadows: comicShadows,
+                    shadows:
+                    comicShadows,
                   ),
                 ),
               ),
+
               Text(
                 '${(value * 100).round()}%',
-                style: const TextStyle(
-                  color: Color(0xFF00A6C7),
+                style:
+                const TextStyle(
+                  color:
+                  Color(0xFF00A6C7),
                   fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                  fontWeight:
+                  FontWeight.bold,
                 ),
               ),
             ],
           ),
+
           SliderTheme(
             data:
-            SliderTheme.of(context).copyWith(
+            SliderTheme.of(
+              context,
+            ).copyWith(
               trackHeight: 6,
               activeTrackColor:
-              const Color(0xFFC45CFF),
+              const Color(
+                0xFFC45CFF,
+              ),
               inactiveTrackColor:
               Colors.white24,
               thumbColor:
-              const Color(0xFF39FF14),
+              const Color(
+                0xFF39FF14,
+              ),
               overlayColor:
               Colors.transparent,
               thumbShape:
               const RoundSliderThumbShape(
-                enabledThumbRadius: 9,
+                enabledThumbRadius:
+                9,
               ),
             ),
             child: Slider(
               value: value,
               min: 0,
               max: 1,
-              onChanged: onChanged,
+
+              // ==================================================
+              // ONLY SOUND EFFECTS SLIDER PLAYS BUTTON SOUND
+              // MUSIC SLIDER DOES NOT
+              // ==================================================
+
+              onChanged: (newValue) {
+                if (playSliderSound) {
+                  playButtonSound(
+                    context,
+                  );
+                }
+
+                onChanged(newValue);
+              },
             ),
           ),
         ],
@@ -1229,29 +2002,52 @@ class _SettingsLanguageButton
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        playButtonSound(
+          context,
+        );
+
+        onTap();
+      },
       borderRadius:
-      BorderRadius.circular(14),
+      BorderRadius.circular(
+        14,
+      ),
       child: Container(
         padding:
         const EdgeInsets.symmetric(
           vertical: 14,
         ),
-        decoration: BoxDecoration(
+        decoration:
+        BoxDecoration(
           color: selected
-              ? const Color(0xFFC45CFF)
-              .withValues(alpha: 0.2)
+              ? const Color(
+            0xFFC45CFF,
+          ).withValues(
+            alpha: 0.2,
+          )
               : Colors.white
-              .withValues(alpha: 0.04),
+              .withValues(
+            alpha: 0.04,
+          ),
           borderRadius:
-          BorderRadius.circular(14),
-          border: Border.all(
+          BorderRadius.circular(
+            14,
+          ),
+          border:
+          Border.all(
             color: selected
-                ? const Color(0xFFC45CFF)
+                ? const Color(
+              0xFFC45CFF,
+            )
                 : Colors.white
-                .withValues(alpha: 0.25),
+                .withValues(
+              alpha: 0.25,
+            ),
           ),
         ),
         child: Row(
@@ -1261,10 +2057,13 @@ class _SettingsLanguageButton
             if (selected) ...[
               const Icon(
                 Icons.check_circle,
-                color: Color(0xFFC45CFF),
+                color:
+                Color(0xFFC45CFF),
                 size: 16,
               ),
-              const SizedBox(width: 6),
+              const SizedBox(
+                width: 6,
+              ),
             ],
             Text(
               label,
@@ -1273,7 +2072,8 @@ class _SettingsLanguageButton
                 fontWeight: selected
                     ? FontWeight.bold
                     : FontWeight.normal,
-                shadows: comicShadows,
+                shadows:
+                comicShadows,
               ),
             ),
           ],
@@ -1300,33 +2100,47 @@ class _DialogButton
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        onPressed: onTap,
+        onPressed: () {
+          playButtonSound(
+            context,
+          );
+
+          onTap();
+        },
         style:
         OutlinedButton.styleFrom(
           foregroundColor: color,
           side: BorderSide(
-            color:
-            color.withValues(alpha: 0.8),
+            color: color.withValues(
+              alpha: 0.8,
+            ),
           ),
           padding:
-          const EdgeInsets.symmetric(
+          const EdgeInsets
+              .symmetric(
             horizontal: 18,
             vertical: 13,
           ),
           shape:
           RoundedRectangleBorder(
             borderRadius:
-            BorderRadius.circular(14),
+            BorderRadius.circular(
+              14,
+            ),
           ),
         ),
         child: Text(
           label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
+          textAlign:
+          TextAlign.center,
+          style:
+          const TextStyle(
             fontWeight:
             FontWeight.bold,
             letterSpacing: 1,
@@ -1347,23 +2161,32 @@ class _GlassDialog
   final List<Widget> children;
 
   const _GlassDialog({
+    super.key,
     required this.title,
     required this.children,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Center(
       child: Material(
-        color: Colors.transparent,
+        color:
+        Colors.transparent,
         child: Padding(
           padding:
-          const EdgeInsets.all(20),
+          const EdgeInsets.all(
+            20,
+          ),
           child: ClipRRect(
             borderRadius:
-            BorderRadius.circular(28),
+            BorderRadius.circular(
+              28,
+            ),
             child: BackdropFilter(
-              filter: ImageFilter.blur(
+              filter:
+              ImageFilter.blur(
                 sigmaX: 20,
                 sigmaY: 20,
               ),
@@ -1372,16 +2195,19 @@ class _GlassDialog
                 constraints:
                 BoxConstraints(
                   maxHeight:
-                  MediaQuery.of(context)
-                      .size
-                      .height *
+                  MediaQuery.of(
+                    context,
+                  ).size.height *
                       0.85,
                 ),
                 padding:
-                const EdgeInsets.all(24),
+                const EdgeInsets.all(
+                  24,
+                ),
                 decoration:
                 BoxDecoration(
-                  color: const Color(
+                  color:
+                  const Color(
                     0xFF111126,
                   ).withValues(
                     alpha: 0.20,
@@ -1390,8 +2216,10 @@ class _GlassDialog
                   BorderRadius.circular(
                     28,
                   ),
-                  border: Border.all(
-                    color: Colors.black,
+                  border:
+                  Border.all(
+                    color:
+                    Colors.black,
                     width: 1.2,
                   ),
                   boxShadow: [
@@ -1423,7 +2251,8 @@ class _GlassDialog
                           fontSize: 20,
                           fontWeight:
                           FontWeight.w900,
-                          letterSpacing: 1.5,
+                          letterSpacing:
+                          1.5,
                           shadows: [
                             Shadow(
                               color:
@@ -1433,7 +2262,8 @@ class _GlassDialog
                                 2,
                                 2,
                               ),
-                              blurRadius: 0,
+                              blurRadius:
+                              0,
                             ),
                           ],
                         ),
@@ -1472,26 +2302,30 @@ class StereotypicalLogo
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return AnimatedBuilder(
       animation: animation,
-      builder: (context, child) {
+      builder: (
+          context,
+          child,
+          ) {
         final currentRotation =
-            animation.value * 6.28318;
+            animation.value *
+                6.28318;
 
         return SizedBox(
           width: size,
           height: size,
           child: Stack(
-            alignment: Alignment.center,
+            alignment:
+            Alignment.center,
             children: [
-              // ==================================================
-              // BACKGROUND SYMBOL
-              // ==================================================
-
               Opacity(
                 opacity: 0.25,
-                child: Transform.translate(
+                child:
+                Transform.translate(
                   offset: Offset(
                     0,
                     size * 0.08,
@@ -1511,17 +2345,14 @@ class StereotypicalLogo
                           Colors.black,
                           offset:
                           Offset(4, 5),
-                          blurRadius: 0,
+                          blurRadius:
+                          0,
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-
-              // ==================================================
-              // LOGO TEXT
-              // ==================================================
 
               Padding(
                 padding:
@@ -1536,7 +2367,6 @@ class StereotypicalLogo
                     alignment:
                     Alignment.center,
                     children: [
-                      // Thick black comic outline
                       Text(
                         'STEREOTYPICAL',
                         textAlign:
@@ -1562,8 +2392,6 @@ class StereotypicalLogo
                                 Colors.black,
                         ),
                       ),
-
-                      // Secondary purple outline
                       Text(
                         'STEREOTYPICAL',
                         textAlign:
@@ -1591,8 +2419,6 @@ class StereotypicalLogo
                             ),
                         ),
                       ),
-
-                      // Main comic text
                       ShaderMask(
                         blendMode:
                         BlendMode.srcIn,
@@ -1634,7 +2460,8 @@ class StereotypicalLogo
                             size * 0.12,
                             fontWeight:
                             FontWeight.w900,
-                            letterSpacing: 1,
+                            letterSpacing:
+                            1,
                             color:
                             Colors.white,
                           ),
@@ -1645,17 +2472,12 @@ class StereotypicalLogo
                 ),
               ),
 
-              // ==================================================
-              // COMIC RAINBOW SLASH
-              // ==================================================
-
               Transform.rotate(
                 angle: -0.72,
                 child: Stack(
                   alignment:
                   Alignment.center,
                   children: [
-                    // Black outline
                     Container(
                       width:
                       size * 1.10,
@@ -1671,8 +2493,6 @@ class StereotypicalLogo
                         ),
                       ),
                     ),
-
-                    // Animated rainbow strip
                     Container(
                       width:
                       size * 1.04,
@@ -1698,10 +2518,6 @@ class StereotypicalLogo
                   ],
                 ),
               ),
-
-              // ==================================================
-              // ANIMATED COMIC CIRCLE
-              // ==================================================
 
               CustomPaint(
                 size:
@@ -1746,11 +2562,8 @@ class RainbowCirclePainter
     final radius =
         size.width / 2 - 8;
 
-    // ==========================================================
-    // HARD BLACK COMIC SHADOW
-    // ==========================================================
-
-    final shadowPaint = Paint()
+    final shadowPaint =
+    Paint()
       ..style =
           PaintingStyle.stroke
       ..strokeWidth = 12
@@ -1763,11 +2576,8 @@ class RainbowCirclePainter
       shadowPaint,
     );
 
-    // ==========================================================
-    // BLACK OUTER OUTLINE
-    // ==========================================================
-
-    final outlinePaint = Paint()
+    final outlinePaint =
+    Paint()
       ..style =
           PaintingStyle.stroke
       ..strokeWidth = 12
@@ -1780,10 +2590,6 @@ class RainbowCirclePainter
       outlinePaint,
     );
 
-    // ==========================================================
-    // ANIMATED RAINBOW
-    // ==========================================================
-
     final shader =
     SweepGradient(
       transform:
@@ -1792,9 +2598,12 @@ class RainbowCirclePainter
       ),
       colors:
       rainbowColors,
-    ).createShader(rect);
+    ).createShader(
+      rect,
+    );
 
-    final rainbowPaint = Paint()
+    final rainbowPaint =
+    Paint()
       ..style =
           PaintingStyle.stroke
       ..strokeWidth = 7
@@ -1806,16 +2615,15 @@ class RainbowCirclePainter
       rainbowPaint,
     );
 
-    // ==========================================================
-    // WHITE COMIC HIGHLIGHT
-    // ==========================================================
-
-    final highlightPaint = Paint()
+    final highlightPaint =
+    Paint()
       ..style =
           PaintingStyle.stroke
       ..strokeWidth = 2
       ..color = Colors.white
-          .withValues(alpha: 0.75);
+          .withValues(
+        alpha: 0.75,
+      );
 
     canvas.drawArc(
       Rect.fromCircle(
@@ -1859,13 +2667,24 @@ class NeonIcon
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     return Material(
-      color: Colors.transparent,
+      color:
+      Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          playButtonSound(
+            context,
+          );
+
+          onTap();
+        },
         borderRadius:
-        BorderRadius.circular(40),
+        BorderRadius.circular(
+          40,
+        ),
         child: Container(
           width: size,
           height: size,
@@ -1873,19 +2692,15 @@ class NeonIcon
           BoxDecoration(
             shape:
             BoxShape.circle,
-
-            // Main comic color
             color: color,
-
-            // Thick black comic outline
-            border: Border.all(
+            border:
+            Border.all(
               color:
               Colors.black,
               width: 4,
             ),
-
-            // Hard offset shadow
-            boxShadow: const [
+            boxShadow:
+            const [
               BoxShadow(
                 color:
                 Colors.black,
@@ -1898,7 +2713,9 @@ class NeonIcon
           ),
           child: Container(
             margin:
-            const EdgeInsets.all(4),
+            const EdgeInsets.all(
+              4,
+            ),
             decoration:
             BoxDecoration(
               shape:
@@ -1928,7 +2745,8 @@ class NeonIcon
                   Colors.black,
                   offset:
                   Offset(3, 3),
-                  blurRadius: 0,
+                  blurRadius:
+                  0,
                 ),
               ],
             ),
@@ -1938,4 +2756,3 @@ class NeonIcon
     );
   }
 }
-
