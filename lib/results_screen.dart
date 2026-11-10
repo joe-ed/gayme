@@ -478,7 +478,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           : 'Nice try, but nope!';
     } else {
       message = isFilipino
-          ? 'Aray... Subukan ulit!'
+          ? 'Nang yan!'
           : 'Oof... Not quite respectful!';
     }
 
