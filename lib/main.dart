@@ -46,6 +46,8 @@ const List<Color> rainbowColors = [
 // BUTTON SOUND
 // ============================================================
 
+final AudioPlayer _buttonSoundPlayer = AudioPlayer();
+
 Future<void> playButtonSound(BuildContext context) async {
   final settings = SettingsScope.read(context);
 
@@ -53,34 +55,47 @@ Future<void> playButtonSound(BuildContext context) async {
     return;
   }
 
-  final player = AudioPlayer();
-
   try {
-    await player.setReleaseMode(
+    await _buttonSoundPlayer.stop();
+
+    await _buttonSoundPlayer.setReleaseMode(
       ReleaseMode.stop,
     );
 
-    await player.setVolume(
+    await _buttonSoundPlayer.setVolume(
       settings.sfxVolume,
     );
 
-    await player.play(
+    await _buttonSoundPlayer.play(
       AssetSource('audio/button_sounds.wav'),
     );
-
-    player.onPlayerComplete.listen((_) async {
-      await player.dispose();
-    });
   } catch (e) {
     debugPrint(
       'Button sound failed to play: $e',
     );
-
-    await player.dispose();
   }
 }
 
-void main() {
+// ============================================================
+// APP
+// ============================================================
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Allow BGM and sound effects to play together.
+  try {
+    await AudioPlayer.global.setAudioContext(
+      AudioContextConfig(
+        focus: AudioContextConfigFocus.mixWithOthers,
+      ).build(),
+    );
+  } catch (e) {
+    debugPrint(
+      'Audio context setup failed: $e',
+    );
+  }
+
   runApp(const StereotypicalApp());
 }
 
@@ -98,7 +113,11 @@ class _StereotypicalAppState
 
   @override
   void dispose() {
+    _buttonSoundPlayer.stop();
+    _buttonSoundPlayer.dispose();
+
     _settings.dispose();
+
     super.dispose();
   }
 
@@ -270,14 +289,21 @@ class _VideoSplashScreenState
     return Scaffold(
       backgroundColor: Colors.black,
       body: SizedBox.expand(
-        child: _videoController.value.isInitialized
+        child:
+        _videoController.value.isInitialized
             ? FittedBox(
           fit: BoxFit.contain,
           child: SizedBox(
             width:
-            _videoController.value.size.width,
+            _videoController
+                .value
+                .size
+                .width,
             height:
-            _videoController.value.size.height,
+            _videoController
+                .value
+                .size
+                .height,
             child: VideoPlayer(
               _videoController,
             ),
@@ -305,7 +331,8 @@ class _MainMenuState extends State<MainMenu>
     with
         SingleTickerProviderStateMixin,
         WidgetsBindingObserver {
-  late final AnimationController _rainbowController;
+  late final AnimationController
+  _rainbowController;
 
   late final VideoPlayerController
   _menuVideoController;
@@ -415,6 +442,49 @@ class _MainMenuState extends State<MainMenu>
     }
 
     _mainBgmPlaying = false;
+  }
+
+  // ==========================================================
+  // ENSURE MAIN MENU BGM IS PLAYING
+  // ==========================================================
+
+  Future<void> _ensureMainBgmPlaying() async {
+    if (!mounted || _gameIsOpen) {
+      return;
+    }
+
+    try {
+      if (_mainBgmPlayer.state ==
+          PlayerState.playing) {
+        _mainBgmPlaying = true;
+        return;
+      }
+
+      await _mainBgmPlayer.setReleaseMode(
+        ReleaseMode.loop,
+      );
+
+      await _mainBgmPlayer.setVolume(
+        _settings.musicVolume,
+      );
+
+      if (_mainBgmPlayer.state ==
+          PlayerState.paused) {
+        await _mainBgmPlayer.resume();
+      } else {
+        await _mainBgmPlayer.play(
+          AssetSource('audio/menu_bgm.mp3'),
+        );
+      }
+
+      _mainBgmPlaying = true;
+    } catch (e) {
+      _mainBgmPlaying = false;
+
+      debugPrint(
+        'Main BGM failed to restore: $e',
+      );
+    }
   }
 
   // ==========================================================
@@ -585,6 +655,7 @@ class _MainMenuState extends State<MainMenu>
         _menuVideoController
             .value.isInitialized) {
       _menuVideoController.play();
+
       _menuVideoController.setLooping(
         true,
       );
@@ -710,7 +781,8 @@ class _MainMenuState extends State<MainMenu>
                           ),
                           decoration:
                           BoxDecoration(
-                            color: const Color(
+                            color:
+                            const Color(
                               0xFF111126,
                             ).withValues(
                               alpha: 0.85,
@@ -773,8 +845,7 @@ class _MainMenuState extends State<MainMenu>
                                     const TextStyle(
                                       color:
                                       Colors.white,
-                                      fontSize:
-                                      12,
+                                      fontSize: 12,
                                       fontWeight:
                                       FontWeight
                                           .bold,
@@ -997,17 +1068,18 @@ class _MainMenuState extends State<MainMenu>
                               context,
                               child,
                               ) {
-                            return ComicPlayButton(
-                              size:
-                              iconSize *
-                                  1.35,
-                              rotation:
-                              _rainbowController
-                                  .value *
-                                  6.28318,
-                              onTap:
-                              startGame,
-                            );
+                            return
+                              ComicPlayButton(
+                                size:
+                                iconSize *
+                                    1.35,
+                                rotation:
+                                _rainbowController
+                                    .value *
+                                    6.28318,
+                                onTap:
+                                startGame,
+                              );
                           },
                         ),
                       ),
@@ -1071,14 +1143,28 @@ class _MainMenuState extends State<MainMenu>
   // ACHIEVEMENTS
   // ============================================================
 
-  void showAchievements() {
-    Navigator.push(
+  Future<void> showAchievements() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
         const AchievementScreen(),
       ),
     );
+
+    if (!mounted) {
+      return;
+    }
+
+    await _ensureMainBgmPlaying();
+
+    if (_menuVideoController
+        .value.isInitialized) {
+      await _menuVideoController
+          .setLooping(true);
+
+      await _menuVideoController.play();
+    }
   }
 
   // ============================================================
@@ -1358,8 +1444,6 @@ class _MainMenuState extends State<MainMenu>
 
                               // ==================================================
                               // MUSIC VOLUME
-                              // BUTTON SOUND ON ICON ONLY
-                              // SLIDER HAS NO BUTTON SOUND
                               // ==================================================
 
                               _SettingsVolumeControl(
@@ -1374,8 +1458,7 @@ class _MainMenuState extends State<MainMenu>
                                 isFilipino
                                     ? 'Musika'
                                     : 'Music',
-                                value:
-                                _settings
+                                value: _settings
                                     .musicVolume,
                                 onChanged:
                                     (value) {
@@ -1396,7 +1479,6 @@ class _MainMenuState extends State<MainMenu>
 
                               // ==================================================
                               // SOUND EFFECTS VOLUME
-                              // BUTTON SOUND ON ICON + SLIDER
                               // ==================================================
 
                               _SettingsVolumeControl(
@@ -1411,8 +1493,7 @@ class _MainMenuState extends State<MainMenu>
                                 isFilipino
                                     ? 'Epekto ng Tunog'
                                     : 'Sound Effects',
-                                value:
-                                _settings
+                                value: _settings
                                     .sfxVolume,
                                 onChanged:
                                     (value) {
@@ -1578,8 +1659,8 @@ class _MainMenuState extends State<MainMenu>
   // HOW TO PLAY
   // ============================================================
 
-  void showHowToPlay() {
-    showInfoDialog(
+  Future<void> showHowToPlay() async {
+    await showInfoDialog(
       isFilipino
           ? 'PAANO MAGLARO'
           : 'HOW TO PLAY',
@@ -1597,8 +1678,8 @@ class _MainMenuState extends State<MainMenu>
   // CREDITS
   // ============================================================
 
-  void showCredits() {
-    showInfoDialog(
+  Future<void> showCredits() async {
+    await showInfoDialog(
       isFilipino
           ? 'MGA KREDITO'
           : 'CREDITS',
@@ -1624,11 +1705,11 @@ class _MainMenuState extends State<MainMenu>
   // INFO DIALOG
   // ============================================================
 
-  void showInfoDialog(
+  Future<void> showInfoDialog(
       String title,
       String message,
-      ) {
-    showGeneralDialog<void>(
+      ) async {
+    await showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
       barrierLabel: title,
@@ -1697,6 +1778,16 @@ class _MainMenuState extends State<MainMenu>
         );
       },
     );
+
+    await _ensureMainBgmPlaying();
+
+    if (_menuVideoController
+        .value.isInitialized) {
+      await _menuVideoController
+          .setLooping(true);
+
+      await _menuVideoController.play();
+    }
   }
 }
 
@@ -1834,12 +1925,12 @@ class _SettingsVolumeControl
   final IconData icon;
   final String title;
   final double value;
+
   final ValueChanged<double>
   onChanged;
+
   final VoidCallback onIconTap;
 
-  // TRUE = slider plays buttons_sound.wav
-  // FALSE = slider stays silent
   final bool playSliderSound;
 
   const _SettingsVolumeControl({
@@ -1962,12 +2053,6 @@ class _SettingsVolumeControl
               value: value,
               min: 0,
               max: 1,
-
-              // ==================================================
-              // ONLY SOUND EFFECTS SLIDER PLAYS BUTTON SOUND
-              // MUSIC SLIDER DOES NOT
-              // ==================================================
-
               onChanged: (newValue) {
                 if (playSliderSound) {
                   playButtonSound(
@@ -1975,7 +2060,9 @@ class _SettingsVolumeControl
                   );
                 }
 
-                onChanged(newValue);
+                onChanged(
+                  newValue,
+                );
               },
             ),
           ),
@@ -2426,9 +2513,11 @@ class StereotypicalLogo
                             (bounds) {
                           return const LinearGradient(
                             begin:
-                            Alignment.topLeft,
+                            Alignment
+                                .topLeft,
                             end:
-                            Alignment.bottomRight,
+                            Alignment
+                                .bottomRight,
                             colors: [
                               Color(
                                 0xFFFF4FCB,
@@ -2460,8 +2549,7 @@ class StereotypicalLogo
                             size * 0.12,
                             fontWeight:
                             FontWeight.w900,
-                            letterSpacing:
-                            1,
+                            letterSpacing: 1,
                             color:
                             Colors.white,
                           ),
@@ -2620,7 +2708,8 @@ class RainbowCirclePainter
       ..style =
           PaintingStyle.stroke
       ..strokeWidth = 2
-      ..color = Colors.white
+      ..color =
+      Colors.white
           .withValues(
         alpha: 0.75,
       );
@@ -2745,8 +2834,7 @@ class NeonIcon
                   Colors.black,
                   offset:
                   Offset(3, 3),
-                  blurRadius:
-                  0,
+                  blurRadius: 0,
                 ),
               ],
             ),

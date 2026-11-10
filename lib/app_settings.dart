@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:volume_controller/volume_controller.dart';
+
 import 'achievement_system.dart';
 
 /// App-wide settings shared by every screen.
@@ -21,6 +23,10 @@ class AppSettings extends ChangeNotifier {
   double _previousSfxVolume = defaultSfxVolume;
 
   final AchievementManager achievements = AchievementManager();
+
+  AppSettings() {
+    _startVolumeListener();
+  }
 
   String get language => _language;
 
@@ -72,14 +78,48 @@ class AppSettings extends ChangeNotifier {
     musicVolume = _musicVolume > 0
         ? 0
         : (_previousMusicVolume > 0
-            ? _previousMusicVolume
-            : defaultMusicVolume);
+        ? _previousMusicVolume
+        : defaultMusicVolume);
   }
 
   void toggleSfx() {
     sfxVolume = _sfxVolume > 0
         ? 0
-        : (_previousSfxVolume > 0 ? _previousSfxVolume : defaultSfxVolume);
+        : (_previousSfxVolume > 0
+        ? _previousSfxVolume
+        : defaultSfxVolume);
+  }
+
+  // ============================================================
+  // HARDWARE VOLUME BUTTON SUPPORT
+  // ============================================================
+
+  void _startVolumeListener() {
+    VolumeController.instance.addListener((volume) {
+      final next = volume.clamp(0.0, 1.0);
+
+      if (next == _musicVolume) {
+        return;
+      }
+
+      _musicVolume = next;
+
+      if (next > 0) {
+        _previousMusicVolume = next;
+      }
+
+      notifyListeners();
+    });
+  }
+
+  // ============================================================
+  // DISPOSE
+  // ============================================================
+
+  @override
+  void dispose() {
+    VolumeController.instance.removeListener();
+    super.dispose();
   }
 }
 
@@ -93,12 +133,13 @@ class SettingsScope extends InheritedNotifier<AppSettings> {
 
   /// Returns the shared settings and rebuilds [context] when they change.
   static AppSettings of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<SettingsScope>();
+    final scope =
+    context.dependOnInheritedWidgetOfExactType<SettingsScope>();
 
     assert(
-      scope != null,
-      'No SettingsScope found in context. '
-      'Wrap your app in a SettingsScope.',
+    scope != null,
+    'No SettingsScope found in context. '
+        'Wrap your app in a SettingsScope.',
     );
 
     return scope!.notifier!;
@@ -108,12 +149,13 @@ class SettingsScope extends InheritedNotifier<AppSettings> {
   ///
   /// Useful inside callbacks where a rebuild is not needed.
   static AppSettings read(BuildContext context) {
-    final scope = context.getInheritedWidgetOfExactType<SettingsScope>();
+    final scope =
+    context.getInheritedWidgetOfExactType<SettingsScope>();
 
     assert(
-      scope != null,
-      'No SettingsScope found in context. '
-      'Wrap your app in a SettingsScope.',
+    scope != null,
+    'No SettingsScope found in context. '
+        'Wrap your app in a SettingsScope.',
     );
 
     return scope!.notifier!;

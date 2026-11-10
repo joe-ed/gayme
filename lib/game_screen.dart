@@ -53,7 +53,8 @@ class _GameScreenState extends State<GameScreen>
 
   final List<AudioPlayer> _answerSoundPlayers = [];
 
-  final List<AudioPlayer> _buttonSoundPlayers = [];
+  // ONE player only for button sounds.
+  final AudioPlayer _buttonSoundPlayer = AudioPlayer();
 
   bool _gameBgmStarted = false;
 
@@ -163,16 +164,12 @@ class _GameScreenState extends State<GameScreen>
       }
     }
 
-    for (final player in List<AudioPlayer>.from(
-      _buttonSoundPlayers,
-    )) {
-      try {
-        await player.pause();
-      } catch (error) {
-        debugPrint(
-          'Button sound pause failed: $error',
-        );
-      }
+    try {
+      await _buttonSoundPlayer.pause();
+    } catch (error) {
+      debugPrint(
+        'Button sound pause failed: $error',
+      );
     }
 
     try {
@@ -221,16 +218,15 @@ class _GameScreenState extends State<GameScreen>
       }
     }
 
-    for (final player in List<AudioPlayer>.from(
-      _buttonSoundPlayers,
-    )) {
-      try {
-        await player.resume();
-      } catch (error) {
-        debugPrint(
-          'Button sound resume failed: $error',
-        );
+    try {
+      if (_buttonSoundPlayer.state ==
+          PlayerState.paused) {
+        await _buttonSoundPlayer.resume();
       }
+    } catch (error) {
+      debugPrint(
+        'Button sound resume failed: $error',
+      );
     }
 
     try {
@@ -340,6 +336,10 @@ class _GameScreenState extends State<GameScreen>
   // ============================================================
 
   Future<void> _playCardSwipeSound() async {
+    if (_settings.sfxVolume <= 0) {
+      return;
+    }
+
     try {
       await _cardSwipePlayer.setVolume(
         _settings.sfxVolume,
@@ -362,6 +362,10 @@ class _GameScreenState extends State<GameScreen>
   Future<void> _playAnswerSound(
       String assetPath,
       ) async {
+    if (_settings.sfxVolume <= 0) {
+      return;
+    }
+
     final player = AudioPlayer();
 
     _answerSoundPlayers.add(player);
@@ -424,43 +428,26 @@ class _GameScreenState extends State<GameScreen>
       return;
     }
 
-    final player = AudioPlayer();
-
-    _buttonSoundPlayers.add(player);
-
-    player.onPlayerComplete.listen((_) async {
-      if (_buttonSoundPlayers.remove(player)) {
-        try {
-          await player.dispose();
-        } catch (error) {
-          debugPrint(
-            'Button sound dispose failed: $error',
-          );
-        }
-      }
-    });
-
     try {
-      await player.setVolume(
-        _settings.sfxVolume,
-      );
+      // Reuse the same player.
+      // This prevents multiple button sounds
+      // from stacking on top of each other.
+      await _buttonSoundPlayer.stop();
 
-      await player.setReleaseMode(
+      await _buttonSoundPlayer.setReleaseMode(
         ReleaseMode.release,
       );
 
-      await player.play(
+      await _buttonSoundPlayer.setVolume(
+        _settings.sfxVolume,
+      );
+
+      await _buttonSoundPlayer.play(
         AssetSource(
-          'audio/buttons_sound.wav',
+          'audio/button_sounds.wav',
         ),
       );
     } catch (error) {
-      _buttonSoundPlayers.remove(player);
-
-      try {
-        await player.dispose();
-      } catch (_) {}
-
       debugPrint(
         'Button sound failed to load: $error',
       );
@@ -472,6 +459,10 @@ class _GameScreenState extends State<GameScreen>
   // ============================================================
 
   Future<void> _playAchievementNotificationSound() async {
+    if (_settings.sfxVolume <= 0) {
+      return;
+    }
+
     try {
       await _achievementNotifPlayer.setVolume(
         _settings.sfxVolume,
@@ -559,19 +550,8 @@ class _GameScreenState extends State<GameScreen>
 
     _answerSoundPlayers.clear();
 
-    for (final player in List<AudioPlayer>.from(
-      _buttonSoundPlayers,
-    )) {
-      try {
-        player.stop();
-      } catch (_) {}
-
-      try {
-        player.dispose();
-      } catch (_) {}
-    }
-
-    _buttonSoundPlayers.clear();
+    _buttonSoundPlayer.stop();
+    _buttonSoundPlayer.dispose();
 
     _gameVideoController.dispose();
 
@@ -1508,7 +1488,15 @@ class _GameScreenState extends State<GameScreen>
                                 onChanged: (value) {
                                   _settings.sfxVolume =
                                       value;
+
+                                  if (value > 0) {
+                                    _playButtonSound();
+                                  }
                                 },
+
+                                // IMPORTANT:
+                                // Do NOT call _playButtonSound()
+                                // here again.
                                 onIconTap:
                                 _settings.toggleSfx,
                               ),
@@ -1697,6 +1685,7 @@ class _GameScreenState extends State<GameScreen>
             children: [
               GestureDetector(
                 onTap: () {
+                  // One button sound only.
                   _playButtonSound();
                   onIconTap();
                 },
